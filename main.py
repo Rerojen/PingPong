@@ -49,10 +49,41 @@ class Player(GameSprite):
         if keys_pressed[K_DOWN] and self.rect.y < windowHeight-100:
             self.rect.y += self.speed
 
+class Ball(sprite.Sprite):
 
-#Создание Двух ракеток
+    def __init__(self, speed_x, speed_y, img, img_x, img_y):
+        super().__init__()
+        self.speed_x = speed_x
+        self.speed_y = speed_y
+        self.image = transform.scale(image.load(img), (img_x, img_y))
+        self.rect = self.image.get_rect()
+
+    def reset(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+
+
+    def update(self):
+
+        if self.rect.y < 0 or self.rect.y > windowHeight-51:
+            self.speed_y *= -1
+        if sprite.collide_rect(player_left, ball) or sprite.collide_rect(player_right, ball):
+            self.speed_x *= -1
+        
+        self.rect.x += self.speed_x
+        self.rect.y += self.speed_y
+
+
+
+#Создание Двух ракеток и мяча
 player_left = Player("playerimg.png", 40, windowHeight/2, players_speed, 20, 100)
 player_right = Player("playerimg.png", windowWidth-60, windowHeight/2, players_speed, 20, 100)
+
+ball = Ball(5, 5, "ball.png", 51, 51)
+
+
+#Настройки текста
+font.init()
+font1 = font.SysFont('Arial', 50)
 
 
 #Основной цикл игры
@@ -61,18 +92,38 @@ finish = False
 
 while game:
 
-    #Отображение объектов
-    window.blit(background, (0, 0))
-    player_left.update_l()
-    player_left.reset()
-    player_right.update_r()
-    player_right.reset()
-
-
     #Выход по крестику
     for e in event.get():
         if e.type == QUIT:
             game = False
 
-    #Обновлние экрана
-    display.update()    
+
+    if finish != True:
+
+        #Отображение объектов
+        window.blit(background, (0, 0))
+
+        player_left.update_l()
+        player_left.reset()
+
+        player_right.update_r()
+        player_right.reset()
+
+        ball.update()
+        ball.reset()
+
+
+
+        #Победы
+        if ball.rect.x < 0:
+            win_right = font1.render("Правый победил", True , (0, 0, 0))
+            window.blit(win_right, (windowHeight/2, 0))
+            finish = True
+        if ball.rect.x >windowWidth-51:
+            win_left = font1.render("Левый победил", True , (0, 0, 0))
+            window.blit(win_left, (windowHeight/2, 0))
+            finish = True
+
+
+        #Обновлние экрана
+        display.update()    
