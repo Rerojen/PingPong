@@ -3,7 +3,7 @@ from pygame import *
 #const
 windowWidth = 1000
 windowHeight = 700
-players_speed = 5
+players_speed = 4
 FPS = 60
 
 #Основные переменные
@@ -17,7 +17,8 @@ clock.tick(FPS)
 #Настройки window
 window = display.set_mode((windowWidth, windowHeight))
 display.set_caption("Ping-Pong")
-#background = transform.scale(image.load("fon.jpg"), (windowWidth, windowHeight))
+background = transform.scale(image.load("fon.png"), (windowWidth, windowHeight))
+
 
 
 class GameSprite(sprite.Sprite):
@@ -36,18 +37,22 @@ class Player(GameSprite):
 
     def update_l(self):
         keys_pressed = key.get_pressed()
-        if keys_pressed[K_UP] and self.rect.x < windowWidth-65:
-            self.rect.x += self.speed
-        if keys_pressed[K_DOWN] and self.rect.x > 0:
-            self.rect.x -= self.speed
+        if keys_pressed[K_w] and self.rect.y > 0:
+            self.rect.y -= self.speed
+        if keys_pressed[K_s] and self.rect.y < windowHeight-100:
+            self.rect.y += self.speed
 
     def update_r(self):
         keys_pressed = key.get_pressed()
-        if keys_pressed[K_w] and self.rect.x < windowWidth-65:
-            self.rect.x += self.speed
-        if keys_pressed[K_s] and self.rect.x > 0:
-            self.rect.x -= self.speed
+        if keys_pressed[K_UP] and self.rect.y > 0:
+            self.rect.y -= self.speed
+        if keys_pressed[K_DOWN] and self.rect.y < windowHeight-100:
+            self.rect.y += self.speed
 
+
+#Создание Двух ракеток
+player_left = Player("playerimg.png", 40, windowHeight/2, players_speed, 20, 100)
+player_right = Player("playerimg.png", windowWidth-60, windowHeight/2, players_speed, 20, 100)
 
 
 #Основной цикл игры
@@ -56,9 +61,18 @@ finish = False
 
 while game:
 
+    #Отображение объектов
+    window.blit(background, (0, 0))
+    player_left.update_l()
+    player_left.reset()
+    player_right.update_r()
+    player_right.reset()
+
+
     #Выход по крестику
     for e in event.get():
         if e.type == QUIT:
             game = False
 
-    
+    #Обновлние экрана
+    display.update()    
